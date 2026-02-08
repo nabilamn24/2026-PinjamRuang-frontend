@@ -1,14 +1,14 @@
-import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, Container, Alert, Spinner, Badge } from 'react-bootstrap';
+import { Table, Container, Alert, Spinner, Badge, Button } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
-// Ini tipe datanya, harus sama persis kayak di C# Backend kamu
+// Interface data (Sesuaikan dengan Backend)
 interface Peminjaman {
   id: number;
   namaPeminjam: string;
   ruangan: string;
-  tanggalPeminjaman: string;
+  tanggalPeminjaman: string; // Pastikan ini sesuai sama Backend kamu
   keperluan: string;
   status: string;
 }
@@ -18,8 +18,9 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Ini fungsi buat ambil data dari Backend
-  useEffect(() => {
+  // 1. Fungsi untuk mengambil data dari API
+  const fetchData = () => {
+    // Pastikan PORT backend benar (5043)
     axios.get('http://localhost:5043/api/peminjaman')
       .then((response) => {
         setDataPeminjaman(response.data);
@@ -30,27 +31,50 @@ const Dashboard = () => {
         setError('Gagal mengambil data dari server. Pastikan backend nyala!');
         setLoading(false);
       });
+  };
+
+  // Panggil data saat halaman pertama kali dibuka
+  useEffect(() => {
+    fetchData();
   }, []);
+
+  // 2. Fungsi untuk MENGHAPUS data
+  const handleDelete = async (id: number) => {
+    // Tampilkan konfirmasi sebelum hapus
+    if (window.confirm('Yakin mau hapus data ini?')) {
+      try {
+        await axios.delete(`http://localhost:5043/api/peminjaman/${id}`);
+        alert('Data berhasil dihapus!');
+        // Refresh data setelah berhasil hapus
+        fetchData();
+      } catch (err) {
+        console.error("Gagal hapus data:", err);
+        alert('Gagal menghapus data. Cek backend!');
+      }
+    }
+  };
 
   return (
     <Container className="mt-5">
-      <h2 className="mb-4 fw-bold">📅 Dashboard Peminjaman Ruang</h2>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="fw-bold">📅 Dashboard Peminjaman Ruang</h2>
+        {/* Tombol Tambah Data */}
+        <Link to="/tambah" className="btn btn-success">
+          + Tambah Peminjaman
+        </Link>
+      </div>
       
-      <Link to="/tambah" className="btn btn-success mb-3">
-        + Tambah Peminjaman
-      </Link>
-
-      {/* Kalau Error, munculin Alert Merah */}
+      {/* Alert jika ada error */}
       {error && <Alert variant="danger">{error}</Alert>}
 
-      {/* Kalau Loading, munculin Muter-muter */}
+      {/* Loading State */}
       {loading ? (
         <div className="text-center">
             <Spinner animation="border" variant="primary" />
             <p className="mt-2">Sedang memuat data...</p>
         </div>
       ) : (
-        /* Kalau Sukses, munculin Tabel */
+        /* Tabel Data */
         <Table striped bordered hover responsive>
           <thead className="table-dark">
             <tr>
@@ -60,12 +84,13 @@ const Dashboard = () => {
               <th>Tanggal</th>
               <th>Keperluan</th>
               <th>Status</th>
+              <th>Aksi</th> {/* Kolom baru untuk tombol Edit/Hapus */}
             </tr>
           </thead>
           <tbody>
             {dataPeminjaman.length === 0 ? (
                 <tr>
-                    <td colSpan={6} className="text-center">Belum ada data peminjaman.</td>
+                    <td colSpan={7} className="text-center">Belum ada data peminjaman.</td>
                 </tr>
             ) : (
                 dataPeminjaman.map((item, index) => (
@@ -73,12 +98,34 @@ const Dashboard = () => {
                     <td>{index + 1}</td>
                     <td>{item.namaPeminjam}</td>
                     <td>{item.ruangan}</td>
+                    {/* Format Tanggal Indonesia */}
                     <td>{new Date(item.tanggalPeminjaman).toLocaleDateString('id-ID')}</td>
                     <td>{item.keperluan}</td>
                     <td>
-                        <Badge bg={item.status === 'Approved' ? 'success' : 'warning'}>
-                            {item.status || 'Menunggu'}
-                        </Badge>
+                        {/* Badge Warna: Hijau jika Approved, Kuning jika Pending */}
+                      <Badge bg={
+                          item.status === 'Approved' ? 'success' :
+                          item.status === 'Rejected' ? 'danger' :
+                          'warning'
+                      }>
+                          
+                        {item.status}
+                      </Badge>
+                    </td>
+                    <td>
+                      {/* Tombol Edit (Kuning) */}
+                      <Link to={`/edit/${item.id}`} className="btn btn-sm btn-warning me-2">
+                        ✏️ Edit
+                      </Link>
+                      
+                      {/* Tombol Hapus (Merah) */}
+                      <Button 
+                        variant="danger" 
+                        size="sm" 
+                        onClick={() => handleDelete(item.id)}
+                      >
+                        🗑️ Hapus
+                      </Button>
                     </td>
                 </tr>
                 ))
