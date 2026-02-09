@@ -82,10 +82,11 @@ const EditPeminjaman = () => {
             required
           >
             <option value="">Pilih Ruangan...</option>
-            <option value="Aula Utama">Aula Utama</option>
-            <option value="Lab Komputer 1">Lab Komputer 1</option>
-            <option value="Ruang Rapat">Ruang Rapat</option>
-            <option value="Studio Musik">Studio Musik</option>
+            <option value="Lab APD">Lab APD</option>
+            <option value="Teater D3">Teater D3</option>
+            <option value="Auditorium">Auditorium</option>
+            <option value="Sekretariat Bersama">Sekretariat Bersama</option>
+            <option value="Student Center">Student Center</option>
           </Form.Select>
         </Form.Group>
 

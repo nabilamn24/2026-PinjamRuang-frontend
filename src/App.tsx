@@ -9,7 +9,7 @@ function App() {
       {/* Navbar Tetap Muncul di Semua Halaman */}
       <nav className="navbar navbar-dark bg-primary mb-4 px-4">
         <span className="navbar-brand mb-0 h1">PinjamRuang App 🏢</span>
-      </nav>re
+      </nav>
 
       {/* Area yang Berubah-ubah */}
       <Routes>
