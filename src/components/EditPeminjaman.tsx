@@ -82,7 +82,7 @@ const EditPeminjaman = () => {
             required
           >
             <option value="">Pilih Ruangan...</option>
-            <option value="Lab APD">Lab APD</option>
+            <option value="Mini Teater">Mini Teater</option>
             <option value="Teater D3">Teater D3</option>
             <option value="Auditorium">Auditorium</option>
             <option value="Sekretariat Bersama">Sekretariat Bersama</option>
